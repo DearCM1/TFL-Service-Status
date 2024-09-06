@@ -93,23 +93,36 @@ def check_reason(response):
 
         return reason
 
-def initialise(root, id):
+def initialise(root):
+    
+    r1, _ = get_tube()
+    r2, _ = get_elizabeth()
+    r3, _ = get_dlr()
 
-    try:
+    response = [r1, r2, r3]
+    last = []
+
+    for i in range(len(response)):
+
+        for j in range(len(response[i])):
+
+            id = response[i][j]['id']
+            
+            try:
         
-        f = open(root+id+".txt","r")
+                f = open(root+id+".txt","r")
 
-    except FileNotFoundError:
+            except FileNotFoundError:
 
-        new_file(root, id)
-        last = 0
+                new_file(root, id)
+                last.append(0)
 
-    finally:
+            finally:
 
-        f = open(root+id+".txt","r")
-        lines = f.readlines()
-        last  = str(int(lines[-1].partition(",")[0]) + 1)
-        f.close()
+                f = open(root+id+".txt","r")
+                lines = f.readlines()
+                last.append(str(int(lines[-1].partition(",")[0]) + 1))
+                f.close()
 
     return last
 
@@ -138,12 +151,25 @@ def get_tube():
 
     return response, now
 
-def handle_tube(new=0):
+def get_elizabeth():
 
-    root = "/Users/Calum/Documents/Docs/Education/projects/tfl_service/data/"
-    response, time = get_tube()
+    res = requests.get('https://api.tfl.gov.uk/line/mode/elizabeth-line/status')
+    response = json.loads(res.text)
+    now = get_now()
 
-    last = initialise(root, response[0]['id'])
+    return response, now
+
+def get_dlr():
+
+    res = requests.get('https://api.tfl.gov.uk/line/mode/dlr/status')
+    response = json.loads(res.text)
+    now = get_now()
+
+    return response, now
+
+def handle_tube(last):
+
+    response, now = get_tube()
     
     for i in range(len(response)):
 
@@ -153,25 +179,62 @@ def handle_tube(new=0):
         reason = check_reason(response[i])
     
         f = open(root+response[i]['id']+".txt","a")
-        f.write("\n"+last+","+time[0]+","+time[1]+","+name+","+status+","+severity+","+reason)
+        f.write("\n"+last[i]+","+now[0]+","+now[1]+","+name+","+status+","+severity+","+reason)
         f.close()
 
         del f, name, status, severity, reason
     
-    del last, new, root, response, time
+    del response, now
+
+def handle_elizabeth(last):
+
+    response, now = get_elizabeth()
+
+    name = response[0]['id']
+    status = str(response[0]['lineStatuses'][0]['statusSeverityDescription'])
+    severity = str(response[0]['lineStatuses'][0]['statusSeverity'])
+    reason = check_reason(response[0])
+
+    f = open(root+response[0]['id']+".txt","a")
+    f.write("\n"+last+","+now[0]+","+now[1]+","+name+","+status+","+severity+","+reason)
+    f.close()
+
+    del f, name, status, severity, reason, response, now
+
+def handle_dlr(last):
+
+    response, now = get_dlr()
+
+    name = response[0]['id']
+    status = str(response[0]['lineStatuses'][0]['statusSeverityDescription'])
+    severity = str(response[0]['lineStatuses'][0]['statusSeverity'])
+    reason = check_reason(response[0])
+
+    f = open(root+response[0]['id']+".txt","a")
+    f.write("\n"+last+","+now[0]+","+now[1]+","+name+","+status+","+severity+","+reason)
+    f.close()
+
+    del f, name, status, severity, reason, response, now
+
+root = "/Users/Calum/Documents/Docs/Education/projects/tfl_service/data/"
+
+k = 0
+
+while True:
+
+    k += 1
+    last = initialise(root)
+
+    handle_tube(last)
+    handle_elizabeth(last[-2])
+    handle_dlr(last[-1])
+
+    time.sleep(60)
+
+    if k > 59:
+
+        break
     
+    else:
 
-
-def get_elizabeth():
-
-    res = requests.get('https://api.tfl.gov.uk/line/mode/elizabeth-line/status')
-    response = json.loads(res.text)
-
-    return response
-
-def get_dlr():
-
-    res = requests.get('https://api.tfl.gov.uk/line/mode/elizabeth-line/status')
-    response = json.loads(res.text)
-
-    return response
+        continue
