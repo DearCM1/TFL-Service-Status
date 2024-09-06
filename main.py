@@ -1,7 +1,15 @@
+# =============================================================
+# packages
+# =============================================================
+
 import time
 import requests
 import json 
 import datetime
+
+# =============================================================
+# functions
+# =============================================================
 
 def get_now():
     # just gets the date and time and outputs two separate
@@ -85,9 +93,38 @@ def check_reason(response):
 
         return reason
 
-def new_file(id):
+def initialise(root, id):
 
-    f = open(id+".txt","x")
+    try:
+        
+        f = open(root+id+".txt","r")
+
+    except FileNotFoundError:
+
+        new_file(root, id)
+        last = 0
+
+    finally:
+
+        f = open(root+id+".txt","r")
+        lines = f.readlines()
+        last  = str(int(lines[-1].partition(",")[0]) + 1)
+        f.close()
+
+    return last
+
+
+def new_file(root, id):
+
+    f = open(root+id+".txt","x")
+    f.write(
+        "0,date,time,name,status,severity,reason"
+    )
+    f.close()
+
+def reset_file(id):
+
+    f = open(id+".txt","w")
     f.write(
         "0,date,time,name,status,severity,reason"
     )
@@ -103,36 +140,25 @@ def get_tube():
 
 def handle_tube(new=0):
 
-    root = "/Users/Calum/Documents/Docs/Education/tfl_service/"
+    root = "/Users/Calum/Documents/Docs/Education/projects/tfl_service/data/"
     response, time = get_tube()
+
+    last = initialise(root, response[0]['id'])
     
     for i in range(len(response)):
-
-        if new == 1:
-
-            new_file(response[i]['id'])
-
-        else:
-
-            new = 0
 
         name = response[i]['id']
         status = str(response[i]['lineStatuses'][0]['statusSeverityDescription'])
         severity = str(response[i]['lineStatuses'][0]['statusSeverity'])
         reason = check_reason(response[i])
-
-        f = open(root+response[i]['id']+".txt","r")
-        lines = f.readlines()
-        last  = str(int(lines[-1].partition(",")[0]) + 1)
-        f.close()
-
+    
         f = open(root+response[i]['id']+".txt","a")
         f.write("\n"+last+","+time[0]+","+time[1]+","+name+","+status+","+severity+","+reason)
         f.close()
 
-        del f, lines, last, name, status, severity, reason
+        del f, name, status, severity, reason
     
-    del new, root, response, time
+    del last, new, root, response, time
     
 
 
