@@ -1,0 +1,4 @@
+0,date,time,name,status,severity,reason
+1,2024_09_06,08:04:19,metropolitan,Good Service,10,none
+2,2024_09_06,08:06:58,metropolitan,Good Service,10,none
+4,2024_09_06,18:16:35,metropolitan,Minor Delays,9,Metropolitan Line: Minor delays between Aldgate and Uxbridge / Chesham due to an earlier faulty train at Farringdon. GOOD SERVICE on the rest of the line. 

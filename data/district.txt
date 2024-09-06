@@ -1,0 +1,4 @@
+0,date,time,name,status,severity,reason
+1,2024_09_06,08:04:19,district,Minor Delays,9,District Line: Minor delays eastbound only between Earls Court and Tower Hill due to an earlier faulty train at Temple. GOOD SERVICE to the rest of the line. 
+2,2024_09_06,08:06:58,district,Minor Delays,9,District Line: Minor delays eastbound only between Earls Court and Tower Hill due to an earlier faulty train at Temple. GOOD SERVICE to the rest of the line. 
+4,2024_09_06,18:16:35,district,Minor Delays,9,District Line: Minor delays between Edgware Road and Wimbledon due to an earlier network rail track fault in the Wimbledon area. GOOD SERVICE on the rest of the line 

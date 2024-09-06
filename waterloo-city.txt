@@ -1,3 +1,0 @@
-0,date,time,name,status,severity,reason
-1,2024_09_06,08:04:19,waterloo-city,Good Service,10,none
-2,2024_09_06,08:06:58,waterloo-city,Good Service,10,none
